@@ -4,7 +4,7 @@ using System.Threading;
 
 namespace TaskLite;
 
-class MyTask<T> : IMyTask<MyTask<T>, T>
+public class MyTask<T> : IMyTask<MyTask<T>, T>
 {
     private bool _completed;
     private T? _value;
@@ -22,7 +22,7 @@ class MyTask<T> : IMyTask<MyTask<T>, T>
         } 
     }
 
-    public T? GetValue {  
+    public T? Result {  
         get
         {
             lock (this)
@@ -75,7 +75,10 @@ class MyTask<T> : IMyTask<MyTask<T>, T>
             if (!_completed)
             {
                 mres = new ManualResetEventSlim();
-                ContinueWith(mres.Set); 
+                ContinueWith(delegate
+                {
+                    mres.Set();
+                }); 
             }
         }
 
@@ -143,7 +146,7 @@ class MyTask<T> : IMyTask<MyTask<T>, T>
                     if (next._exception is not null)
                         t.SetException(next._exception);
                     else
-                        t.SetResult(next.GetValue);
+                        t.SetResult(next.Result);
                 });
             }
             catch (Exception e)
@@ -179,7 +182,7 @@ class MyTask<T> : IMyTask<MyTask<T>, T>
             try
             {
                 var result = action();
-                t.SetResult(result.GetValue);
+                t.SetResult(result.Result);
             }
             catch (Exception e)
             {

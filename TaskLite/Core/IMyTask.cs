@@ -2,10 +2,11 @@ using System;
 
 namespace TaskLite;
 
-public interface IMyTask<TMyTask, TValue> where TMyTask : IMyTask<TMyTask, TValue>
+public interface IMyTask<TMyTask, TValue> 
+    where TMyTask : IMyTask<TMyTask, TValue>
 {
     bool IsCompleted { get; }
-    TValue? GetValue { get; }
+    TValue? Result { get; }
     void SetResult(TValue value);
     void SetException(Exception exception);
     void Wait();
