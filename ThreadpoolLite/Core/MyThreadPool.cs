@@ -1,20 +1,8 @@
-﻿using System;
 using System.Collections.Concurrent;
-using System.Threading;
 
-for (int i = 0; i < 100; i++)
-{
-    int currentContext_i = i;
-    MyThreadPool.QueueUserWorkItem(delegate
-    {
-        Console.WriteLine(currentContext_i);
-        Thread.Sleep(1000);
-    });
-}
+namespace MyThreadpool.Core;
 
-Console.ReadLine();
-
-static class MyThreadPool
+public static class MyThreadPool
 {
     private static readonly BlockingCollection<Action> s_workItems = new();
 
