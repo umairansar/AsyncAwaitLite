@@ -26,4 +26,6 @@ public interface IMyTask<T>
     T ContinueWith(Action action);
     T ContinueWith(Func<T> action);
     static abstract T Run(Action action);
+    static abstract T WhenAll(List<T> tasks);
+    static abstract T Iterate(IEnumerable<T> tasks);
 }

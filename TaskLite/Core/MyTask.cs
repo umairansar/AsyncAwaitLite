@@ -371,4 +371,62 @@ class MyTask : IMyTask<MyTask>
         
         return t;
     }
+
+    public static MyTask WhenAll(List<MyTask> tasks)
+    {
+        MyTask t = new();
+
+        if (tasks.Count == 0)
+        {
+            t.SetResult();
+        }
+        else
+        {
+            int remaining = tasks.Count;
+
+            Action continuation = () =>
+            {
+                if (Interlocked.Decrement(ref remaining) == 0)
+                {
+                    t.SetResult();
+                }
+            };
+            
+            foreach (var task in tasks)
+            {
+                task.ContinueWith(continuation);
+            }
+        }
+        
+        return t;
+    }
+
+    public static MyTask Iterate(IEnumerable<MyTask> tasks)
+    {
+        MyTask t = new();
+
+        IEnumerator<MyTask> e = tasks.GetEnumerator();
+        
+        void MoveNext()
+        {
+            try
+            {
+                if (e.MoveNext())
+                {
+                    var next = e.Current;
+                    next.ContinueWith(MoveNext);
+                    return;
+                }
+            }
+            catch (Exception exception)
+            {
+                t.SetException(exception);
+            }
+          
+            t.SetResult();
+        }
+        
+        MoveNext();
+        return t;
+    }
 }
